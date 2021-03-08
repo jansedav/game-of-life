@@ -69,69 +69,65 @@ const Grid:FC<TSProps> = (props) => {
     }
 
     const handleStart = () => {
-        let changedArray = grid.slice();
-        let i:number,j:number;
-        for(i = 0; i < props.rows - 1; i++){
-            for(j = 0; j < props.columns - 1; j++){
-                changedArray[i][j] = handleAmIAlive(grid[i][j], getNeighborCounter(i, j, grid[i][j]));
+            let changedArray:number[][] = new Array(props.rows).fill(0).map(() => new Array(props.columns).fill(0));
+            let i:number,j:number;
+            for(i = 0; i < props.rows ; i++){
+                for(j = 0; j < props.columns ; j++){
+                    changedArray[i][j] = handleAmIAlive(grid[i][j], getNeighborCounter(i, j));
+                };
             };
-        };
-        setGrid(changedArray);
+            setGrid(changedArray);
     }
 
     const handleAmIAlive = (amIAlive:number, neighborCount:number) => {
-        if(neighborCount > 4 || neighborCount < 3){
-            return 0;
-        }
-        else if(amIAlive === 0 && neighborCount === 3){
-            return 1;
+        if(amIAlive === 1){
+            if(neighborCount === 2 || neighborCount === 3){
+                return 1;
+            }
+            else{
+                return 0;
+            }
         }
         else{
-            return amIAlive;
+            if(neighborCount === 3){
+                return 1;
+            }
+            else{ 
+                return 0;
+            }
         }
     }
 
-    const getNeighborCounter = (row:number, col:number, amIAlive:number) => {
-        let totalNeighbours = 0;
+    const getNeighborCounter = (row:number, col:number) => {
+        let neighbours = 0;
+        neighbours =  neighbours + setCellValueHelper(row - 1, col - 1);
 
-        if(row > 0){
-            totalNeighbours += grid[row -1][col];
-        }
+        neighbours =  neighbours + setCellValueHelper(row - 1, col);
 
-        if(row > 0 && col < props.columns - 1){
-            totalNeighbours += grid[row -1][col + 1];
-        }
+        neighbours =  neighbours + setCellValueHelper(row - 1, col + 1);
 
-        if(row > 0 && col > 0){
-            totalNeighbours += grid[row -1][col - 1];
-        }
+        neighbours =  neighbours + setCellValueHelper(row, col - 1);
 
-        if(row < props.rows - 1 && col > 0){
-            totalNeighbours += grid[row + 1][col - 1];
-        }
+        neighbours =  neighbours + setCellValueHelper(row, col + 1);
 
-        if(row < props.rows - 1){
-            totalNeighbours += grid[row + 1][col];
-        }
+        neighbours =  neighbours + setCellValueHelper(row + 1, col - 1);
 
-        if(row < props.rows - 1 && col < props.columns - 1){
-            totalNeighbours += grid[row + 1][col + 1];
-        }
- 
-        if(col > 0){
-            totalNeighbours += grid[row][col - 1];
-        }
+        neighbours =  neighbours + setCellValueHelper(row + 1, col);
 
-        if( col < props.columns - 1){
-            totalNeighbours += grid[row][col + 1];
-        }
+        neighbours =  neighbours + setCellValueHelper(row + 1, col + 1);
 
-        if(amIAlive === 1){
-            totalNeighbours += amIAlive;
+
+        return neighbours;
+    };
+
+    const setCellValueHelper = (row:number, col:number) => {
+        try {
+            return grid[row][col] === 1 ? 1 : 0;
         }
-        
-        return totalNeighbours;
-    }
+        catch {
+            return 0;
+         }
+    };
 
 
     return(
